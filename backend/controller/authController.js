@@ -29,8 +29,7 @@ const Register = async (req, res,next) => {
       user: {
         _id: newUser._id,
         name: newUser.name,
-        workEmail: newUser.workEmail,
-        role: newUser.role,
+        email: newUser.email,
       },
     });
 
@@ -101,15 +100,7 @@ const Login = async (req, res,next) => {
 const Logout = async (req, res,next) => {
   try {
     const refreshToken = req.cookies.refreshToken;
-
-    if (refreshToken) {
-      // Remove refresh token from DB
-      await User.updateOne(
-        { refreshToken },
-        { $unset: { refreshToken: "" } }
-      );
-    }
-
+    
     // Clear cookies (both tokens)
     res.clearCookie("accessToken", {
       httpOnly: true,

@@ -64,8 +64,9 @@ const updateNote = async (req, res,next) => {
     );
 
     if (!note) {
+      const error = new Error("Note not found");
       res.status(404);
-      return next(new Error("Note not found"))
+      return next(error)
     }
 
     res.status(200).json({
@@ -83,15 +84,17 @@ const deleteNote = async (req,res,next)=>{
         const {id} = req.params;
 
     if (!id) {
+      const error = new Error("Note ID is required");
       res.status(400);
-      next(new Error("Note ID is required"));
+      next(error);
     }
 
     const note = await Note.findOneAndDelete({ _id: id, userID: req.user._id });
 
     if (!note) {
+      const error = new Error("Note not found");
       res.status(404);
-      next(new Error("Note not found"));
+      next(error);
     }
 
     res.status(200).json({
@@ -100,7 +103,7 @@ const deleteNote = async (req,res,next)=>{
          });
 
     }catch(error){
-        res.status(500).json({message: error.message});
+      next(error);
     }
 
 }
