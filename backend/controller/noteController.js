@@ -1,11 +1,14 @@
 import Note from '../models/NotesModel.js';
-import User from '../models/UserModel.js';
 
 
-const getNotes = async (req,res)=>{
-    try{
-    
+const getNotes = async (req,res,next)=>{
+    try{   
     const notes = await Note.find({userID:req.user._id}).sort({createdAt:-1});
+
+    if (!notes) {
+      res.status(404);
+      throw new Error("No notes found for this user");
+    }
 
     res.status(200).json({
     message:"Notes fetched successfully",
@@ -13,15 +16,17 @@ const getNotes = async (req,res)=>{
     });
 
     }catch(error){
-        res.status(500).json({message: error.message});
+      next(error);
     }
 }
-const createNote = async (req,res)=>{
+const createNote = async (req,res,next)=>{
     try{
        const {title,content} = req.body;   
 
        if(!title || !content){
-        return res.status(400).json({message: "Mssing required fields"});
+        const error = new Error("Missing required fields");
+         res.status(400);
+         return next(error);
        }
 
        const note = await Note.create({
@@ -37,17 +42,19 @@ const createNote = async (req,res)=>{
 
 
     }catch(error){
-    res.status(500).json({message: error.message});
-}
+      next(error);
+    }
 }
 
-const updateNote = async (req, res) => {
+const updateNote = async (req, res,next) => {
   try {
     const { id } = req.params;
     const { title, content } = req.body;
 
     if (!title || !content) {
-      return res.status(400).json({ message: "Missing required fields" });
+      const error = new Error("Missing required fields");
+      res.status(400);
+      return next(error);
     }
 
     const note = await Note.findOneAndUpdate(
@@ -57,7 +64,8 @@ const updateNote = async (req, res) => {
     );
 
     if (!note) {
-      return res.status(404).json({ message: "Note not found or not authorized" });
+      res.status(404);
+      return next(new Error("Note not found"))
     }
 
     res.status(200).json({
@@ -65,24 +73,25 @@ const updateNote = async (req, res) => {
       note,
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
 
-const deleteNote = async (req,res)=>{
+const deleteNote = async (req,res,next)=>{
     try{
         const {id} = req.params;
 
     if (!id) {
-      return res.status(400).json({ message: "Missing required fields" });
+      res.status(400);
+      next(new Error("Note ID is required"));
     }
 
-        const note = await Note.findOneAndDelete({ _id: id, userID: req.user._id });
-
+    const note = await Note.findOneAndDelete({ _id: id, userID: req.user._id });
 
     if (!note) {
-      return res.status(404).json({ message: "Note not found" });
+      res.status(404);
+      next(new Error("Note not found"));
     }
 
     res.status(200).json({

@@ -2,14 +2,16 @@ import User from '../models/UserModel.js';
 import { hashPassword, comparePassword } from '../utils/hasher.js';
 import { generateAccessToken,generateRefreshToken } from '../utils/generateToken.js';
 
-const Register = async (req, res) => {
+const Register = async (req, res,next) => {
     try {
         const { name, email, password } = req.body;
 
         const existingUser = await User.findOne({email});
         
         if (existingUser) {
-            return res.status(400).json({ message: 'Email already in use' });
+            const error = new Error('Email already in use');
+            res.status(400);
+            return next(error);
         }
         const hashedPassword = await hashPassword(password);
 
@@ -34,20 +36,28 @@ const Register = async (req, res) => {
 
     }
     catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 }
 
-const Login = async (req, res) => {
+const Login = async (req, res,next) => {
     try{
         const { email, password } = req.body;
 
         const user = await User.findOne({ email });
 
-        if (!user) return res.status(401).json({ message: 'User not found!' });
+        if (!user){
+          const error = new Error('User not found!');
+          res.status(401);
+          return next(error);
+          } 
         
         const isMatch = await comparePassword(password, user.password);
-        if (!isMatch) return res.status(401).json({ message: 'Invalid credentials!' });
+        if (!isMatch){
+          const error = new Error('Invalid credentials!');
+          res.status(401);
+          return next(error);
+        }
         
         const accessToken = generateAccessToken(user);
         const refreshToken = generateRefreshToken(user);
@@ -83,12 +93,12 @@ const Login = async (req, res) => {
     });
     }
     catch (error) {
-        res.status(500).json({ message: error.message });
-        }    
+       next(error);
+  }    
 }
 
     
-const Logout = async (req, res) => {
+const Logout = async (req, res,next) => {
   try {
     const refreshToken = req.cookies.refreshToken;
 
@@ -115,7 +125,7 @@ const Logout = async (req, res) => {
 
     res.status(200).json({ message: "Logged out successfully" });
   } catch (err) {
-    res.status(500).json({ message: "Server error", error: err.message });
+    next(err);
   }
 };
 
