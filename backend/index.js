@@ -6,6 +6,8 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
+import noteRoutes from "./routes/noteRoutes.js";
+
 
 dotenv.config()
 const app = express();
@@ -20,6 +22,8 @@ app.use(morgan("dev"));
 connectDB();
 
 app.use("/api/auth", authRoutes);
+app.use("/api/notes", noteRoutes);
+
 
 app.get("/", (req, res) => {
   res.send("API is running...");

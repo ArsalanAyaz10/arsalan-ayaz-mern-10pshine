@@ -1,5 +1,3 @@
-import { time } from "console";
-import e from "cors";
 import mongoose from"mongoose";
 
 const userSchema = new mongoose.Schema({
