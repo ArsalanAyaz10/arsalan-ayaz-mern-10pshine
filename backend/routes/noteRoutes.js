@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.get("/fetch",Authenticate,getNotes);
 router.post("/create", Authenticate, upload.single("file"),checkNote(noteSchema),createNote);
-router.put("/:id",Authenticate,updateNote);
+router.put("/:id",Authenticate,upload.single("file"),updateNote);
 router.delete("/:id",Authenticate,deleteNote);
 
 export default router;

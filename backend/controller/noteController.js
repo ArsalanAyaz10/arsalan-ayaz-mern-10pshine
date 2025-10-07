@@ -1,7 +1,9 @@
 import Note from '../models/NotesModel.js';
+import { cloudinary } from '../config/cloudinary.js';
 
 const getNotes = async (req,res,next)=>{
-    try{   
+    try{
+   
     const notes = await Note.find({userID:req.user._id}).sort({createdAt:-1});
 
     if (!notes) {
@@ -20,7 +22,7 @@ const getNotes = async (req,res,next)=>{
 }
 const createNote = async (req, res, next) => {
   try {
-    console.log("File received:", req.file);
+   // console.log("File received:", req.file);
 
     const { title, content } = req.body;
     if (!title || !content) {
@@ -54,8 +56,6 @@ const createNote = async (req, res, next) => {
   }
 };
 
-
-
 const updateNote = async (req, res,next) => {
   try {
     const { id } = req.params;
@@ -66,12 +66,11 @@ const updateNote = async (req, res,next) => {
       res.status(400);
       return next(error);
     }
-
-    const note = await Note.findOneAndUpdate(
-      { _id: id, userID: req.user._id },
-      { title, content },
-      { new: true, runValidators: true }
-    );
+    
+   const note = await Note.findOne({
+      _id: id,
+      userID: req.user._id,
+   });
 
     if (!note) {
       const error = new Error("Note not found");
@@ -79,43 +78,84 @@ const updateNote = async (req, res,next) => {
       return next(error)
     }
 
+    let fileData = {};
+    if (req.file) {
+      if (note.filePublicId) {
+        try {
+          await cloudinary.uploader.destroy(note.filePublicId, { resource_type: "auto" });
+          console.log("Old Cloudinary file deleted:", note.filePublicId);
+        } catch (cloudErr) {
+          console.error("Error deleting old file:", cloudErr);
+        }
+      }
+
+      fileData = {
+        fileUrl: req.file.path,
+        filePublicId: req.file.filename,
+        fileType: req.file.mimetype,
+      };
+    }
+
+      const updatedNote = await Note.findOneAndUpdate(
+      { _id: id, userID: req.user._id },
+      {
+        title,
+        content,
+        ...fileData,
+      },
+      { new: true, runValidators: true }
+    );
+
     res.status(200).json({
       message: "Note updated successfully",
-      note,
+      updatedNote,
     });
   } catch (error) {
     next(error);
   }
 };
 
-
-const deleteNote = async (req,res,next)=>{
-    try{
-        const {id} = req.params;
+const deleteNote = async (req, res, next) => {
+  try {
+    const { id } = req.params;
 
     if (!id) {
-      const error = new Error("Note ID is required");
       res.status(400);
-      next(error);
+      return next(new Error("Note ID is required"));
     }
 
     const note = await Note.findOneAndDelete({ _id: id, userID: req.user._id });
 
     if (!note) {
-      const error = new Error("Note not found");
       res.status(404);
-      next(error);
+      return next(new Error("Note not found"));
+    }
+
+    // 🧹 If a file exists, delete it from Cloudinary
+    if (note.filePublicId) {
+      try {
+        // Map mimetype to resource_type
+        let resourceType = "raw";
+        if (note.fileType.startsWith("image/")) resourceType = "image";
+        else if (note.fileType.startsWith("video/")) resourceType = "video";
+
+        const result = await cloudinary.uploader.destroy(note.filePublicId, {
+          resource_type: resourceType,
+        });
+
+        console.log("✅ Cloudinary delete result:", result);
+      } catch (err) {
+        console.error("❌ Error deleting file from Cloudinary:", err);
+      }
     }
 
     res.status(200).json({
-            message: "Note deleted",
-            note,
-         });
-
-    }catch(error){
-      next(error);
-    }
-
-}
+      message: "Note deleted successfully",
+      note,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 export {getNotes,createNote,updateNote,deleteNote};
