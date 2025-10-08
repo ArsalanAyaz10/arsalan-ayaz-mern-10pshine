@@ -131,10 +131,8 @@ const deleteNote = async (req, res, next) => {
       return next(new Error("Note not found"));
     }
 
-    // 🧹 If a file exists, delete it from Cloudinary
     if (note.filePublicId) {
       try {
-        // Map mimetype to resource_type
         let resourceType = "raw";
         if (note.fileType.startsWith("image/")) resourceType = "image";
         else if (note.fileType.startsWith("video/")) resourceType = "video";
@@ -143,9 +141,9 @@ const deleteNote = async (req, res, next) => {
           resource_type: resourceType,
         });
 
-        console.log("✅ Cloudinary delete result:", result);
+        console.log("Cloudinary delete result:", result);
       } catch (err) {
-        console.error("❌ Error deleting file from Cloudinary:", err);
+        console.error("Error deleting file from Cloudinary:", err);
       }
     }
 

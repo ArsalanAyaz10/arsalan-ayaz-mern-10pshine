@@ -22,7 +22,7 @@ const storage = new CloudinaryStorage({
   },
 });
 
-// Multer config
+//Multer
 const upload = multer({
   storage,
   fileFilter: (req, file, cb) => {
