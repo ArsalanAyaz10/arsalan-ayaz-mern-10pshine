@@ -40,6 +40,18 @@ const errorHandler = (err, req, res, next) => {
     userAgent: req.headers["user-agent"],
   });
 
+  Logger.error({
+  name: err.name,
+  message: err.message,
+  stack: err.stack,
+  statusCode,
+  path: req.originalUrl,
+  method: req.method,
+  ip: req.ip,
+  userAgent: req.headers["user-agent"],
+});
+
+console.error("Global Error Handler:", err); 
   res.status(statusCode).json({
     success: false,
     message,
