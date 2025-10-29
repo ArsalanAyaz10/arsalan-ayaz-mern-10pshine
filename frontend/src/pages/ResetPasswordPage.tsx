@@ -49,7 +49,7 @@ const ResetPassword = () => {
         return;
       }
 
-      setSuccess("✅ Password successfully reset! Redirecting...");
+      setSuccess("Password successfully reset! Redirecting...");
       setTimeout(() => navigate("/login"), 2500);
     } catch (err) {
       console.error("Reset password error:", err);

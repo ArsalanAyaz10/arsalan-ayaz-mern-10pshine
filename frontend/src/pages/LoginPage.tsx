@@ -13,42 +13,47 @@ const Login = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError("");
 
-    if (!email || !password) {
-      setError("Please fill in all fields.");
-      return;
+  if (!email || !password) {
+    setError("Please fill in all fields.");
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    const res = await API.post("/auth/login", { email, password });
+
+    const { accessToken, user } = res.data;
+
+    if (accessToken && user) {
+      // Store token and user info
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("user", JSON.stringify(user));
+
+      API.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+
+      toast.success(`Welcome back, ${user.name}!`);
+      navigate("/dashboard");
+    } else {
+      throw new Error("Invalid response from server.");
     }
+  } catch (err: any) {
+    console.error(err);
+    const msg = err.response?.data?.message || "Invalid credentials. Try again.";
+    setError(msg);
+    toast.error(msg);
+  } finally {
+    setLoading(false);
+  }
+};
 
-    try {
-      setLoading(true);
-
-      const res = await API.post("/auth/login", { email, password });
-
-      // ✅ assuming backend sends back accessToken
-      const token = res.data?.accessToken;
-      if (token) {
-        localStorage.setItem("accessToken", token);
-      }
-
-      toast.success("Login successful 🎉");
-      navigate("/dashboard"); // redirect after login
-
-    } catch (err: any) {
-      console.error(err);
-      const msg = err.response?.data?.message || "Invalid credentials. Try again.";
-      setError(msg);
-      toast.error(msg);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
-      {/* Left Illustration */}
       <div className="flex-1 flex items-center justify-center p-8 bg-gradient-to-br from-blue-600 to-indigo-700">
         <motion.img
           initial={{ opacity: 0, y: 30 }}

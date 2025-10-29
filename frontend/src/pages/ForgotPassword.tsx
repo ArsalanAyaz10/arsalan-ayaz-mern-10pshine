@@ -43,7 +43,7 @@ const ForgotPassword = () => {
         return;
       }
 
-      setSuccess("✅ Password reset link has been sent to your email.");
+      setSuccess("Password reset link has been sent to your email.");
       setEmail("");
     } catch (err) {
       console.error("Forgot Password Error:", err);
@@ -55,7 +55,7 @@ const ForgotPassword = () => {
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
-      {/* Left Illustration */}
+      
       <div className="flex-1 flex items-center justify-center p-8 bg-gradient-to-br from-blue-600 to-indigo-700">
         <motion.img
           initial={{ opacity: 0, y: 30 }}
