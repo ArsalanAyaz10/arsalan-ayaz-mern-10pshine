@@ -32,7 +32,6 @@ Thumbs.db
 *.bak
 *.tmp
 
-/package-lock.json
 /pnpm-lock.yaml
 /yarn.lock
 
