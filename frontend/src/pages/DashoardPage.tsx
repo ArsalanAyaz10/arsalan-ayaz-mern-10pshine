@@ -2,7 +2,8 @@ import { useEffect, useState, useRef } from "react";
 import { Menu, User, LogOut, FileText, StickyNote, Info } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import API from "../api/axios";
-import NoteCard from "../components/NoteCard"; // ✅ Import your NoteCard component
+import NoteCard from "../components/NoteCard"; 
+import SideNavbar from "../components/SideNavbar";
 
 interface Note {
   _id: string;
@@ -65,50 +66,12 @@ const Dashboard = () => {
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
-      <aside
-        className={`bg-blue-100 text-gray-800 shadow-md transition-all duration-300 ${
-          isSidebarOpen ? "w-56" : "w-16"
-        } flex flex-col`}
-      >
-        <button
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="p-4 text-gray-600 hover:text-blue-600"
-        >
-          <Menu size={22} />
-        </button>
-
-        <nav className="flex-1 space-y-4 mt-6">
-          <Link
-            to="/dashboard"
-            className="flex items-center gap-3 px-4 py-2 hover:bg-blue-200 rounded-md transition"
-          >
-            <FileText size={18} />
-            {isSidebarOpen && <span>Dashboard</span>}
-          </Link>
-
-          <Link
-            to="/mynotes"
-            className="flex items-center gap-3 px-4 py-2 hover:bg-blue-200 rounded-md transition"
-          >
-            <StickyNote size={18} />
-            {isSidebarOpen && <span>My Notes</span>}
-          </Link>
-
-          <Link
-            to="/about"
-            className="flex items-center gap-3 px-4 py-2 hover:bg-blue-200 rounded-md transition"
-          >
-            <Info size={18} />
-            {isSidebarOpen && <span>About Project</span>}
-          </Link>
-        </nav>
-      </aside>
-
+        <SideNavbar />
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Navbar */}
         <header className="flex justify-between items-center px-6 py-4 bg-blue-700 text-white shadow">
-          <h1 className="text-2xl font-semibold">NoteIT</h1>
+          <h1 className="text-2xl font-semibold">NoteKro</h1>
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setShowDropdown((prev) => !prev)}
@@ -117,25 +80,63 @@ const Dashboard = () => {
               <User />
             </button>
 
-            {showDropdown && (
-              <div className="absolute right-0 mt-2 w-40 bg-white text-gray-800 rounded-lg shadow-md border">
-                <button
-                  onClick={() => {
-                    setShowDropdown(false);
-                    navigate("/profile");
-                  }}
-                  className="w-full text-left px-4 py-2 hover:bg-gray-100"
-                >
-                  View Profile
-                </button>
-                <button
-                  onClick={handleLogout}
-                  className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
-                >
-                  <LogOut size={16} /> Logout
-                </button>
-              </div>
-            )}
+           {showDropdown && (
+  <div className="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-xl border border-gray-200 p-4 z-50">
+    {/* Profile Section */}
+    <div className="flex items-center gap-3 border-b pb-3 mb-3">
+      {/* Avatar with initials */}
+      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold text-lg">
+        {user?.name
+          ? user.name
+              .split(" ")
+              .map((n: string) => n[0])
+              .join("")
+              .toUpperCase()
+          : "U"}
+      </div>
+
+      {/* Name + Email */}
+      <div className="flex flex-col">
+        <p className="font-semibold text-gray-900 text-sm">{user?.name || "Your Name"}</p>
+        <p className="text-xs text-gray-500 truncate w-40">{user?.email || "yourname@email.com"}</p>
+      </div>
+    </div>
+
+    {/* Menu Items */}
+    <div className="flex flex-col text-sm text-gray-700">
+      <button
+        onClick={() => {
+          setShowDropdown(false);
+          navigate("/profile");
+        }}
+        className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+      >
+        <i className="ri-user-line text-gray-500"></i>
+        My Profile
+      </button>
+
+      <button
+        onClick={() => {
+          setShowDropdown(false);
+          navigate("/settings");
+        }}
+        className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+      >
+        <i className="ri-settings-3-line text-gray-500"></i>
+        Settings
+      </button>
+
+      <button
+        onClick={handleLogout}
+        className="flex items-center gap-2 px-3 py-2 mt-1 rounded-lg hover:bg-red-50 text-red-600 transition-colors"
+      >
+        <i className="ri-logout-circle-line text-red-500"></i>
+        Log Out
+      </button>
+    </div>
+  </div>
+)}
+
           </div>
         </header>
 
