@@ -13,16 +13,15 @@ const NoteCard = ({ note }: NoteCardProps) => {
   const navigate = useNavigate();
 
   return (
-    <div
-      onClick={() => navigate(`/note/${note._id}`)}
-      className="bg-yellow-200 p-4 rounded-xl shadow-md cursor-pointer hover:scale-105 transition-transform w-[250px] h-[200px] overflow-hidden"
-    >
-      <h3 className="font-semibold text-black text-lg truncate mb-2">{note.title}</h3>
-      <p className="text-sm text-gray-700 line-clamp-4">{note.content}</p>
-      <p className="text-xs text-gray-500 mt-2">
-        {new Date(note.createdAt).toLocaleDateString()}
-      </p>
-    </div>
+<div
+  onClick={() => navigate(`/note/${note._id}`)}
+  className="bg-yellow-200 p-5 rounded-xl shadow-md cursor-pointer hover:scale-105 transition-transform w-full min-h-[180px] overflow-hidden"
+>
+  <h3 className="font-semibold text-black text-lg truncate mb-2">{note.title}</h3>
+  <p className="text-sm text-gray-700 line-clamp-4">{note.content}</p>
+  <p className="text-xs text-gray-500 mt-2">{new Date(note.createdAt).toLocaleDateString()}</p>
+</div>
+
   );
 };
 

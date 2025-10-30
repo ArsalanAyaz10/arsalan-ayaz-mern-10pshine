@@ -37,7 +37,7 @@ function App() {
           />
 
           <Route
-            path="/my-notes"
+            path="/mynotes"
             element={
               <ProtectedRoute>
                 <MyNotes />

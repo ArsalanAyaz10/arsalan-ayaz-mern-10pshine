@@ -10,7 +10,7 @@ const Navbar = () => {
         onClick={() => navigate("/dashboard")}
         className="text-xl font-semibold text-blue-600 cursor-pointer"
       >
-        NotePro
+        NoteKro
       </h1>
 
       <div

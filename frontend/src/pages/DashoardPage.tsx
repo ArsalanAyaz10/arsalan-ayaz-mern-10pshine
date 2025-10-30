@@ -14,7 +14,6 @@ interface Note {
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [showDropdown, setShowDropdown] = useState(false);
   const [notes, setNotes] = useState<Note[]>([]);
   const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -66,7 +65,7 @@ const Dashboard = () => {
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
-        <SideNavbar />
+      <SideNavbar />
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Navbar */}
@@ -145,10 +144,10 @@ const Dashboard = () => {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-2xl font-semibold text-gray-800">
-                Hey {user?.name || "User"} 👋
+                Hey {user?.name || "User"}!
               </h2>
               <p className="text-gray-600 text-lg italic">
-                Forgot something? Take a look at your latest notes or make a new one.
+                Forgot something? Take a look at your latest notes!
               </p>
             </div>
 
@@ -161,7 +160,7 @@ const Dashboard = () => {
           </div>
 
           {/* Notes Section */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             {notes.length > 0 ? (
               notes.map((note) => <NoteCard key={note._id} note={note} />)
             ) : (

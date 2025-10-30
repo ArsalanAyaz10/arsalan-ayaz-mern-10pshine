@@ -1,9 +1,9 @@
 const AboutProject = () => {
   return (
     <div className="p-10">
-      <h1 className="text-3xl font-bold text-blue-700 mb-4">About NoteIT</h1>
+      <h1 className="text-3xl font-bold text-blue-700 mb-4">About NoteKro</h1>
       <p className="text-gray-600 leading-relaxed max-w-2xl">
-        NoteIT is a simple yet powerful note management application built using 
+        NoteKro is a simple yet powerful note management application built using 
         the MERN stack. It allows users to securely create, edit, and organize 
         their personal notes with a smooth and user-friendly interface.
       </p>

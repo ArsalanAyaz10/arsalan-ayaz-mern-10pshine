@@ -81,7 +81,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               Welcome Back
             </h2>
             <p className="text-gray-500 text-sm">
-              Login to your NotesPro account
+              Login to your NotesKro account
             </p>
           </div>
 
