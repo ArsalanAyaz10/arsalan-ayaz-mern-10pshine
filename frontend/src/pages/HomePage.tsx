@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 const Home = () => {
   return (
     <div className="flex flex-col md:flex-row min-h-screen w-full bg-gradient-to-br from-blue-50 to-indigo-100 overflow-hidden">
-      {/* Left Section - Illustration */}
+      
       <motion.div
         initial={{ opacity: 0, x: -50 }}
         animate={{ opacity: 1, x: 0 }}
@@ -18,7 +18,7 @@ const Home = () => {
         />
       </motion.div>
 
-      {/* Right Section - Content */}
+      {/* Right Section */}
       <motion.div
         initial={{ opacity: 0, x: 50 }}
         animate={{ opacity: 1, x: 0 }}

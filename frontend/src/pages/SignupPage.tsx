@@ -33,7 +33,7 @@ const Signup = () => {
     try {
       setLoading(true);
 
-      // Make API call
+      //API CALL
       const response = await API.post("/auth/register", {
         name:username,
         email,
@@ -56,7 +56,7 @@ const Signup = () => {
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
-      {/* Left Illustration */}
+      
       <div className="flex-1 flex items-center justify-center p-8 bg-gradient-to-br from-blue-50 to-blue-100">
         <motion.img
           initial={{ opacity: 0, y: 30 }}
@@ -68,7 +68,7 @@ const Signup = () => {
         />
       </div>
 
-      {/* Right Form Section */}
+      {/*Form*/}
       <div className="flex-1 flex items-center justify-center p-8">
         <motion.div
           initial={{ opacity: 0, x: 40 }}
