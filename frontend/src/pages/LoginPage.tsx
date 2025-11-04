@@ -59,7 +59,7 @@ const handleSubmit = async (e: React.FormEvent) => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          src="https://cdn3d.iconscout.com/3d/premium/thumb/secure-login-3d-icon-download-in-png-blend-fbx-gltf-file-formats--password-protected-authentication-pack-icons-6284652.png"
+          src="/login.svg"
           alt="Login Illustration"
           className="max-w-xs md:max-w-sm drop-shadow-2xl"
         />
