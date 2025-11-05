@@ -1,0 +1,35 @@
+name: Build
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  sonarqube:
+    name: SonarQube
+    # It's better to use ubuntu-latest for performance unless you have a specific Windows requirement
+    runs-on: ubuntu-latest 
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          # The host URL defaults to SonarCloud, but keeping it is fine.
+          # SONAR_HOST_URL: https://sonarcloud.io 
+        with:
+          # --- ADD THESE TWO MANDATORY LINES ---
+          projectKey: ArsalanAyaz10_arsalan-ayaz-mern-10pshine
+          organization: arsalanayaz10
+          # -------------------------------------
+          
+          # Use 'args' to pass other properties, like pointing to the properties file
+          # or overriding 'sonar.sources' if you need to.
+          # Since sonar-project.properties is in the root, you likely don't need 'args'.
+          # If you do need args, make sure to escape or quote them properly:
+          # args: -Dsonar.sources=.
