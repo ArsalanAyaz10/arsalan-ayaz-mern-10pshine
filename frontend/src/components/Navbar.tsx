@@ -14,6 +14,7 @@ const Navbar = () => {
       </h1>
 
       <div
+        aria-label="profile-icon"
         className="cursor-pointer hover:scale-105 transition"
         onClick={() => navigate("/profile")}
       >
