@@ -11,6 +11,7 @@ jobs:
   sonarcloud:
     name: SonarCloud Scan
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -39,15 +40,19 @@ jobs:
           cd backend
           npm install
 
+      - name: Set Backend Environment Variables
+        run: |
+          echo "JWT_SECRET=test-secret" >> backend/.env
+          echo "REFRESH_TOKEN_SECRET=test-refresh" >> backend/.env
+          echo "NODE_ENV=test" >> backend/.env
+
       - name: Run Backend Tests with Coverage
+        working-directory: backend
         env:
           JWT_SECRET: test-secret
           REFRESH_TOKEN_SECRET: test-refresh
-          MONGO_URI: mongodb://localhost:27017/testdb
           NODE_ENV: test
-        run: |
-          cd backend
-          npm test -- --coverage
+        run: npm test -- --coverage
 
       # Run SonarCloud Scan
       - name: SonarCloud Scan
