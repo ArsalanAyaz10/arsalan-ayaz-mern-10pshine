@@ -1,43 +1,19 @@
-name: Build & SonarCloud Scan
-
+name: Build
 on:
   push:
     branches:
-      - develop
+      - main
   pull_request:
     types: [opened, synchronize, reopened]
-
 jobs:
-  sonarcloud:
-    name: SonarCloud Scan
-    runs-on: ubuntu-latest
-
+  sonarqube:
+    name: SonarQube
+    runs-on: windows-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      # Run tests BEFORE SonarCloud to generate coverage
-      - name: Install & Test Frontend
-        run: |
-          cd frontend
-          npm ci
-          npm test -- --coverage --watchAll=false
-
-      - name: Install & Test Backend
-        run: |
-          cd backend
-          npm ci
-          npm test -- --coverage --runInBand
-
-      # SonarCloud Scan
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v3
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
