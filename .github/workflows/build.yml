@@ -32,7 +32,7 @@ jobs:
       - name: Run Frontend Tests with Coverage
         run: |
           cd frontend
-          npm test -- --coverage
+          npm test -- --coverage --watchAll=false
 
       # Install and Test BACKEND
       - name: Install Backend Dependencies
