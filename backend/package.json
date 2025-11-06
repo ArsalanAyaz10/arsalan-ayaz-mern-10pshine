@@ -4,7 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "nyc mocha --exit",
+    "test": "nyc --reporter=lcov mocha --exit",
     "start": "node index.js",
     "dev": "nodemon index.js"
   },

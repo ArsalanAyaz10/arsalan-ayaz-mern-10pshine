@@ -40,9 +40,14 @@ jobs:
           npm install
 
       - name: Run Backend Tests with Coverage
+        env:
+          JWT_SECRET: test-secret
+          REFRESH_TOKEN_SECRET: test-refresh
+          MONGO_URI: mongodb://localhost:27017/testdb
+          NODE_ENV: test
         run: |
           cd backend
-          npm test
+          npm test -- --coverage
 
       # Run SonarCloud Scan
       - name: SonarCloud Scan
