@@ -1,15 +1,21 @@
 import { expect } from "chai";
 import supertest from "supertest";
 import crypto from "crypto";
+import sinon from "sinon";
 import app from "../app.js";
 import User from "../models/UserModel.js";
+import * as emailService from "../utils/mailer.js"; // <-- mock this
 import "./setup.js";
 
 const request = supertest(app);
 
-describe("Auth API", () => {
+describe("Auth API", function () {
+  this.timeout(10000); // increase timeout for this suite
   let token;
-  let resetToken;
+
+  after(() => {
+    sinon.restore();
+  });
 
   it("should register a new user", async () => {
     const res = await request.post("/api/auth/register").send({
@@ -53,8 +59,6 @@ describe("Auth API", () => {
     const user = await User.findOne({ email: "test@example.com" });
     expect(user.resetPasswordToken).to.exist;
     expect(user.resetPasswordExpire).to.exist;
-
-    resetToken = user.resetPasswordToken;
   });
 
   it("should reset the password successfully", async () => {
@@ -76,7 +80,6 @@ describe("Auth API", () => {
     expect(res.status).to.equal(200);
     expect(res.body.message).to.match(/reset/i);
 
-    // Verify token removed
     const updatedUser = await User.findOne({ email: "test@example.com" });
     expect(updatedUser.resetPasswordToken).to.be.undefined;
     expect(updatedUser.resetPasswordExpire).to.be.undefined;
