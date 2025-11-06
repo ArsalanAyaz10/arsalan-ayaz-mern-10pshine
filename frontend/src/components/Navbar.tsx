@@ -10,10 +10,11 @@ const Navbar = () => {
         onClick={() => navigate("/dashboard")}
         className="text-xl font-semibold text-blue-600 cursor-pointer"
       >
-        NotePro
+        NoteKro
       </h1>
 
       <div
+        aria-label="profile-icon"
         className="cursor-pointer hover:scale-105 transition"
         onClick={() => navigate("/profile")}
       >
