@@ -32,7 +32,7 @@ const Home = () => {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="text-4xl md:text-5xl font-bold text-gray-800 mb-4"
           >
-            Welcome to <span className="text-blue-600">NotesPro</span>
+            Welcome to <span className="text-blue-600">NoteKro!</span>
           </motion.h1>
 
           <motion.p
