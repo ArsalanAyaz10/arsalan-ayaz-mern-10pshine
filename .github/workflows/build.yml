@@ -21,14 +21,23 @@ jobs:
         with:
           node-version: 18
 
-      # -------- Install & Test Backend --------
+      # -------- Install & Test Backend (With Environment Variables) --------
       - name: Install Backend Dependencies
         working-directory: backend
         run: npm install
 
       - name: Run Backend Tests with Coverage
         working-directory: backend
+        # Inject the fallback secrets to resolve 401 Unauthorized errors
+        # The 'npm test' command must complete successfully for SonarCloud to analyze coverage.
         run: npm test
+        env:
+          # Match the fallback from generateAccessToken (from your token code)
+          JWT_ACCESS_SECRET: 'test-secret' 
+          # Match the fallback from generateRefreshToken (from your token code)
+          JWT_REFRESH_SECRET: 'test-refresh' 
+          # Assuming you need MongoDB credentials for tests to connect
+          MONGODB_URI: ${{ secrets.MONGODB_URI_TEST }}
 
       # -------- Install & Test Frontend --------
       - name: Install Frontend Dependencies
@@ -37,6 +46,7 @@ jobs:
 
       - name: Run Frontend Tests with Coverage
         working-directory: frontend
+        # Assuming this command creates a coverage/lcov.info file
         run: npm test -- --coverage
 
       # -------- SonarCloud Scan --------
@@ -44,3 +54,5 @@ jobs:
         uses: SonarSource/sonarcloud-github-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        # The SonarCloud action will automatically find and use the 
+        # sonar-project.properties file from the root directory.
