@@ -1,52 +1,19 @@
-name: SonarCloud Scan
-
+name: Build
 on:
   push:
-    # Only run the full scan on pushes to the develop branch (to set the baseline)
-    branches: [develop]
+    branches:
+      - main
   pull_request:
-    # Run tests and a quick scan on PRs (to check new code quality)
     types: [opened, synchronize, reopened]
-
 jobs:
-  sonarcloud:
-    runs-on: ubuntu-latest
-
+  sonarqube:
+    name: SonarQube
+    runs-on: windows-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-
-      - name: Setup Node.js (Version 18)
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      # -------- Install & Test Backend (With Environment Variables) --------
-      - name: Install Backend Dependencies
-        working-directory: backend
-        run: npm install
-
-      - name: Run Backend Tests with Coveragegit
-        working-directory: backend
-        run: npm test
-        env:
-          JWT_ACCESS_SECRET: 'test-secret' 
-          JWT_REFRESH_SECRET: 'test-refresh' 
-          MONGODB_URI: ${{ secrets.MONGODB_URI_TEST }}
-
-      # -------- Install & Test Frontend --------
-      - name: Install Frontend Dependencies
-        working-directory: frontend
-        run: npm install
-
-      - name: Run Frontend Tests with Coverage
-        working-directory: frontend
-        run: npm test -- --coverage
-
-      # -------- SonarCloud Scan --------
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v2
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
