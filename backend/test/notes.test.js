@@ -2,6 +2,7 @@ import { expect } from "chai";
 import supertest from "supertest";
 import app from "../app.js";
 import "./setup.js";
+
 import User from "../models/UserModel.js"; 
 import Note from "../models/NotesModel.js"; 
 
@@ -27,11 +28,16 @@ describe("Notes API", () => {
         });
 
         token = loginRes.body.accessToken;
+        
+        if (!token) {
+            throw new Error("Failed to retrieve access token: Login response missing token.");
+        }
     });
 
     after(async () => {
         await User.deleteMany({ email: testEmail });
     });
+
 
     it("should create a new note", async () => {
         const res = await request
@@ -39,7 +45,7 @@ describe("Notes API", () => {
             .set("Authorization", `Bearer ${token}`) 
             .send({
                 title: "Test Note",
-                content: "Valid Content Here", // Content is now > 6 chars
+                content: "Valid Content Here",
             });
 
         expect(res.status).to.equal(201);
@@ -52,7 +58,7 @@ describe("Notes API", () => {
             .set("Authorization", `Bearer ${token}`) 
             .send({ 
                 title: "Fetch Test", 
-                content: "Content is long enough now" // FIX: Valid Content
+                content: "Content is long enough now"
             });
         
         expect(createRes.status).to.equal(201);
@@ -63,13 +69,13 @@ describe("Notes API", () => {
 
         expect(res.status).to.equal(200);
         expect(res.body).to.have.property("notes");
-        // This assertion should now pass since a note was successfully created
         expect(res.body.notes).to.be.an("array").that.is.not.empty;
     });
 
     
     describe("Note Modification and Deletion", () => {
         let noteId;
+
         beforeEach(async () => {
             const res = await request
                 .post("/api/notes/create")
@@ -84,7 +90,7 @@ describe("Notes API", () => {
         
         it("should update a note", async () => {
             const res = await request
-                .put(`/api/notes/${noteId}`) // Uses the fresh noteId
+                .put(`/api/notes/${noteId}`) 
                 .set("Authorization", `Bearer ${token}`)
                 .send({
                     title: "Updated Note",
@@ -98,7 +104,7 @@ describe("Notes API", () => {
 
         it("should delete a note", async () => {
             const res = await request
-                .delete(`/api/notes/${noteId}`) // Uses the fresh noteId
+                .delete(`/api/notes/${noteId}`) 
                 .set("Authorization", `Bearer ${token}`);
 
             expect(res.status).to.equal(200);
