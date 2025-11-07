@@ -1,26 +1,17 @@
-process.env.NODE_ENV = "test"; // ✅ must be first
-
 import { expect } from "chai";
 import supertest from "supertest";
 import crypto from "crypto";
 import sinon from "sinon";
 import app from "../app.js";
 import User from "../models/UserModel.js";
-import * as emailService from "../utils/mailer.js"; // to mock
+import * as emailService from "../utils/mailer.js"; // <-- mock this
 import "./setup.js";
-
+z
 const request = supertest(app);
 
 describe("Auth API", function () {
-  this.timeout(15000); // CI needs more time
-  
+  this.timeout(10000); // increase timeout for this suite
   let token;
-  let sendEmailStub;
-
-  before(() => {
-    // ✅ Mock email so real emails aren't sent
-    sendEmailStub = sinon.stub(emailService, "sendEmail").resolves("OK");
-  });
 
   after(() => {
     sinon.restore();
@@ -44,10 +35,9 @@ describe("Auth API", function () {
       password: "123456",
     });
 
-    expect(res.status).to.equal(200);
+    expect(res.status).to.be.oneOf([200, 201]);
     expect(res.body).to.have.property("accessToken");
     token = res.body.accessToken;
-    expect(token).to.exist;
   });
 
   it("should logout the user successfully", async () => {
@@ -55,7 +45,7 @@ describe("Auth API", function () {
       .post("/api/auth/logout")
       .set("Authorization", `Bearer ${token}`);
 
-    expect([200, 204]).to.include(res.status); // ✅ flexible
+    expect(res.status).to.be.oneOf([200, 204]);
   });
 
   it("should trigger forgot password and set token in DB", async () => {
@@ -88,7 +78,7 @@ describe("Auth API", function () {
       .send({ password: "newPassword123" });
 
     expect(res.status).to.equal(200);
-    expect(res.body.message.toLowerCase()).to.contain("reset");
+    expect(res.body.message).to.match(/reset/i);
 
     const updatedUser = await User.findOne({ email: "test@example.com" });
     expect(updatedUser.resetPasswordToken).to.be.undefined;

@@ -19,7 +19,6 @@ describe("Notes API", function () {
       email: "note@example.com",
       password: "123456",
     });
-
     expect(registerRes.status).to.equal(201);
 
     const loginRes = await request.post("/api/auth/login").send({
@@ -42,12 +41,11 @@ describe("Notes API", function () {
       });
 
     expect(res.status).to.equal(201);
+    expect(res.body).to.have.property("note");
+    expect(res.body.note.title).to.equal("Test Note");
 
-    const note = res.body.note; // assuming your controller returns `note`
-    expect(note).to.exist;
-    expect(note.title).to.equal("Test Note");
-
-    noteId = note._id;
+    noteId = res.body.note._id;
+    expect(noteId).to.exist;
   });
 
   it("should fetch all notes for the logged-in user", async () => {
