@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
 
+process.env.MONGOMS_DOWNLOAD_MIRROR = "https://fastdl.mongodb.org/";
+process.env.MONGOMS_DISABLE_POSTINSTALL = "true";
+
 let mongoServer;
 
 before(async () => {
