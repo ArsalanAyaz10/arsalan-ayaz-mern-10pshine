@@ -14,6 +14,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
+          # fetch-depth: 0 is essential for SonarCloud to get the history needed for PR analysis
           fetch-depth: 0
 
       - name: Setup Node
@@ -28,14 +29,10 @@ jobs:
 
       - name: Run Backend Tests with Coverage
         working-directory: backend
-        # Inject the fallback secrets to ensure token signing/verification succeeds
         run: npm test
         env:
-          # Used for Access Token signing/verification
           JWT_ACCESS_SECRET: 'test-secret' 
-          # Used for Refresh Token signing/verification
           JWT_REFRESH_SECRET: 'test-refresh' 
-          # You MUST also include any other required secrets (like MongoDB URI)
           MONGODB_URI: ${{ secrets.MONGODB_URI_TEST }}
           
       # -------- Install & Test Frontend --------
@@ -47,8 +44,13 @@ jobs:
         working-directory: frontend
         run: npm test -- --coverage
 
-      # -------- SonarCloud Scan --------
+      # -------- SonarCloud Scan (Final Configuration Fix) --------
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        # FIX: Use 'args' to manually configure the branch name when pushing to develop.
+        # This establishes 'develop' as the baseline branch.
+        with:
+          args: >
+            ${{ github.ref == 'refs/heads/develop' && '-Dsonar.branch.name=develop' || '' }}
