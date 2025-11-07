@@ -4,6 +4,8 @@ import { MongoMemoryServer } from "mongodb-memory-server";
 process.env.MONGOMS_DOWNLOAD_MIRROR = "https://fastdl.mongodb.org/";
 process.env.MONGOMS_DISABLE_POSTINSTALL = "true";
 
+mongoose.set("strictQuery", false); // ✅ optional but recommended
+
 let mongoServer;
 
 before(async () => {

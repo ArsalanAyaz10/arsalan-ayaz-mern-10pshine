@@ -1,3 +1,5 @@
+process.env.NODE_ENV = "test"; // ✅ must be very top
+
 import { expect } from "chai";
 import supertest from "supertest";
 import app from "../app.js";
@@ -5,23 +7,29 @@ import "./setup.js";
 
 const request = supertest(app);
 
-describe("Notes API", () => {
+describe("Notes API", function () {
+  this.timeout(10000);
+
   let token;
   let noteId;
 
   before(async () => {
-    await request.post("/api/auth/register").send({
+    const registerRes = await request.post("/api/auth/register").send({
       name: "noteuser",
       email: "note@example.com",
       password: "123456",
     });
+
+    expect(registerRes.status).to.equal(201);
 
     const loginRes = await request.post("/api/auth/login").send({
       email: "note@example.com",
       password: "123456",
     });
 
+    expect(loginRes.status).to.equal(200);
     token = loginRes.body.accessToken;
+    expect(token).to.exist;
   });
 
   it("should create a new note", async () => {
@@ -34,11 +42,15 @@ describe("Notes API", () => {
       });
 
     expect(res.status).to.equal(201);
-    expect(res.body).to.have.property("note");
-    noteId = res.body.note._id;
+
+    const note = res.body.note; // assuming your controller returns `note`
+    expect(note).to.exist;
+    expect(note.title).to.equal("Test Note");
+
+    noteId = note._id;
   });
 
-  it("should fetch all notes for the user", async () => {
+  it("should fetch all notes for the logged-in user", async () => {
     const res = await request
       .get("/api/notes/fetch")
       .set("Authorization", `Bearer ${token}`);
@@ -46,6 +58,7 @@ describe("Notes API", () => {
     expect(res.status).to.equal(200);
     expect(res.body).to.have.property("notes");
     expect(res.body.notes).to.be.an("array");
+    expect(res.body.notes.length).to.be.greaterThan(0);
   });
 
   it("should update a note", async () => {
@@ -68,6 +81,7 @@ describe("Notes API", () => {
       .set("Authorization", `Bearer ${token}`);
 
     expect(res.status).to.equal(200);
-    expect(res.body.message).to.match(/deleted/i);
+    expect(res.body).to.have.property("message");
+    expect(res.body.message.toLowerCase()).to.include("deleted");
   });
 });
