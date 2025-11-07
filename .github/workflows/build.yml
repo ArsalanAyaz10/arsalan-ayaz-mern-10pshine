@@ -28,7 +28,7 @@ jobs:
         working-directory: backend
         run: npm install
 
-      - name: Run Backend Tests with Coverage
+      - name: Run Backend Tests with Coveragegit
         working-directory: backend
         run: npm test
         env:
