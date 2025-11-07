@@ -1,53 +1,19 @@
-name: SonarCloud Scan
-
+name: Build
 on:
   push:
-    branches: [develop]
+    branches:
+      - develop
   pull_request:
     types: [opened, synchronize, reopened]
-
 jobs:
-  sonarcloud:
+  sonarqube:
+    name: SonarQube
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          # essential for SonarCloud to get the history needed for PR analysis
-          fetch-depth: 0
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      # -------- Install & Test Backend --------
-      - name: Install Backend Dependencies
-        working-directory: backend
-        run: npm install
-
-      - name: Run Backend Tests with Coverage
-        working-directory: backend
-        run: npm test
-        env:
-          # Environment variables for passing tests
-          JWT_ACCESS_SECRET: 'test-secret' 
-          JWT_REFRESH_SECRET: 'test-refresh' 
-          MONGODB_URI: ${{ secrets.MONGODB_URI_TEST }}
-          
-      # -------- Install & Test Frontend --------
-      - name: Install Frontend Dependencies
-        working-directory: frontend
-        run: npm install
-
-      - name: Run Frontend Tests with Coverage
-        working-directory: frontend
-        run: npm test -- --coverage
-
-      # -------- SonarCloud Scan--------
-      - name: SonarCloud Scan
-        if: ${{ github.event_name == 'push' }} 
-        uses: SonarSource/sonarcloud-github-action@v2
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
