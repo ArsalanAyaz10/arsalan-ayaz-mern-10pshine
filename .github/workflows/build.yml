@@ -45,7 +45,7 @@ jobs:
         working-directory: frontend
         run: npm test -- --coverage
 
-      # -------- SonarCloud Scan - TEMPORARY PR BYPASS --------
+      # -------- SonarCloud Scan--------
       - name: SonarCloud Scan
         if: ${{ github.event_name == 'push' }} 
         uses: SonarSource/sonarcloud-github-action@v2
