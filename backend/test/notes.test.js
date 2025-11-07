@@ -1,100 +1,108 @@
-// File: backend/test/notes.test.js (CORRECTED)
-
 import { expect } from "chai";
 import supertest from "supertest";
 import app from "../app.js";
 import "./setup.js";
-import User from "../models/UserModel.js"; // Assume you need this for cleanup
-import Note from "../models/NoteModel.js"; // Assume you need this for cleanup
+import User from "../models/UserModel.js"; 
+import Note from "../models/NotesModel.js"; 
 
 const request = supertest(app);
 
 describe("Notes API", () => {
     let token;
-    let noteId;
     const testEmail = "note@example.com";
 
-    // Use beforeEach to ensure a fresh, valid token for *every* test, improving isolation.
     beforeEach(async () => {
-        // Aggressive cleanup (Good practice in CI)
         await User.deleteMany({ email: testEmail });
         await Note.deleteMany({}); 
 
-        // 1. Register a new user
         await request.post("/api/auth/register").send({
             name: "noteuser",
             email: testEmail,
             password: "123456",
         });
 
-        // 2. Login and get a fresh token
         const loginRes = await request.post("/api/auth/login").send({
             email: testEmail,
             password: "123456",
         });
 
-        // *** CRITICAL: Ensure the token variable is set correctly ***
         token = loginRes.body.accessToken;
-        
-        // This is a sanity check, which you can remove later:
-        if (!token) {
-            throw new Error("Failed to retrieve access token during setup!");
-        }
     });
 
-    // Cleanup after the entire suite runs (optional, but clean)
     after(async () => {
         await User.deleteMany({ email: testEmail });
-        await Note.deleteMany({}); 
     });
-
 
     it("should create a new note", async () => {
         const res = await request
             .post("/api/notes/create")
-            .set("Authorization", `Bearer ${token}`) // <--- Uses the token from beforeEach
+            .set("Authorization", `Bearer ${token}`) 
             .send({
                 title: "Test Note",
-                content: "Note content",
+                content: "Valid Content Here", // Content is now > 6 chars
             });
 
-        expect(res.status).to.equal(201); // Expect 201 Created
+        expect(res.status).to.equal(201);
         expect(res.body).to.have.property("note");
-        noteId = res.body.note._id;
     });
-
+    
     it("should fetch all notes for the user", async () => {
+        const createRes = await request
+            .post("/api/notes/create")
+            .set("Authorization", `Bearer ${token}`) 
+            .send({ 
+                title: "Fetch Test", 
+                content: "Content is long enough now" // FIX: Valid Content
+            });
+        
+        expect(createRes.status).to.equal(201);
+            
         const res = await request
             .get("/api/notes/fetch")
-            .set("Authorization", `Bearer ${token}`); // <--- Uses the token
+            .set("Authorization", `Bearer ${token}`);
 
-        expect(res.status).to.equal(200); // Expect 200 OK
+        expect(res.status).to.equal(200);
         expect(res.body).to.have.property("notes");
-        expect(res.body.notes).to.be.an("array");
+        // This assertion should now pass since a note was successfully created
+        expect(res.body.notes).to.be.an("array").that.is.not.empty;
     });
 
-    it("should update a note", async () => {
-        // NOTE: This test will fail if 'noteId' is not set. 
-        // For production tests, you should create a note *in* a beforeEach or setup block.
-        const res = await request
-            .put(`/api/notes/${noteId}`)
-            .set("Authorization", `Bearer ${token}`) // <--- Uses the token
-            .send({
-                title: "Updated Note",
-                content: "Updated content",
-            });
+    
+    describe("Note Modification and Deletion", () => {
+        let noteId;
+        beforeEach(async () => {
+            const res = await request
+                .post("/api/notes/create")
+                .set("Authorization", `Bearer ${token}`) 
+                .send({
+                    title: "Note for update/delete",
+                    content: "Fresh note content for modification",
+                });
+            
+            noteId = res.body.note._id;
+        });
+        
+        it("should update a note", async () => {
+            const res = await request
+                .put(`/api/notes/${noteId}`) // Uses the fresh noteId
+                .set("Authorization", `Bearer ${token}`)
+                .send({
+                    title: "Updated Note",
+                    content: "Updated content, which is also long enough",
+                });
 
-        expect(res.status).to.equal(200); // Expect 200 OK
-        expect(res.body).to.have.property("updatedNote");
-        expect(res.body.updatedNote.title).to.equal("Updated Note");
-    });
+            expect(res.status).to.equal(200);
+            expect(res.body).to.have.property("updatedNote");
+            expect(res.body.updatedNote.title).to.equal("Updated Note");
+        });
 
-    it("should delete a note", async () => {
-        const res = await request
-            .delete(`/api/notes/${noteId}`)
-            .set("Authorization", `Bearer ${token}`); // <--- Uses the token
+        it("should delete a note", async () => {
+            const res = await request
+                .delete(`/api/notes/${noteId}`) // Uses the fresh noteId
+                .set("Authorization", `Bearer ${token}`);
 
-        expect(res.status).to.equal(200); // Expect 200 OK
-        expect(res.body.message).to.match(/deleted/i);
+            expect(res.status).to.equal(200);
+            expect(res.body.message).to.match(/deleted/i);
+        });
     });
 });

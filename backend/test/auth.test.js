@@ -10,11 +10,10 @@ import "./setup.js";
 const request = supertest(app);
 
 describe("Auth API", function () {
-    // Setting a standard 10-second timeout now that the known slow test is removed.
     this.timeout(10000); 
     let token;
 
-    // After hook remains for clean up, particularly for any potential stubs or mocks.
+    
     after(() => {
         sinon.restore();
     });
@@ -50,12 +49,9 @@ describe("Auth API", function () {
         expect(res.status).to.be.oneOf([200, 204]);
     });
 
-    // NOTE: The "should trigger forgot password and set token in DB" test was removed to fix the CI timeout issue.
 
     it("should reset the password successfully", async () => {
-        // Since the 'forgot password' test was removed, we manually create the reset token 
-        // in the database to allow this test to function correctly.
-        const rawToken = crypto.randomBytes(20).toString("hex");
+       const rawToken = crypto.randomBytes(20).toString("hex");
         const hashedToken = crypto.createHash("sha256").update(rawToken).digest("hex");
 
         await User.updateOne(
