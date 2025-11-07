@@ -16,7 +16,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          # Required for SonarCloud to analyze the history needed for PR analysis
           fetch-depth: 0
 
       - name: Setup Node.js (Version 18)
@@ -24,22 +23,23 @@ jobs:
         with:
           node-version: 18
 
-      # -------- Install Dependencies (Backend & Frontend) --------
+      # -------- Install & Test Backend (With Environment Variables) --------
       - name: Install Backend Dependencies
         working-directory: backend
         run: npm install
 
-      - name: Install Frontend Dependencies
-        working-directory: frontend
-        run: npm install
-
-      # -------- Run Tests and Generate Coverage (CRITICAL) --------
       - name: Run Backend Tests with Coverage
         working-directory: backend
         run: npm test
         env:
           JWT_ACCESS_SECRET: 'test-secret' 
-          MONGODB_URI: ${{ secrets.MONGODB_URI_TEST }} 
+          JWT_REFRESH_SECRET: 'test-refresh' 
+          MONGODB_URI: ${{ secrets.MONGODB_URI_TEST }}
+
+      # -------- Install & Test Frontend --------
+      - name: Install Frontend Dependencies
+        working-directory: frontend
+        run: npm install
 
       - name: Run Frontend Tests with Coverage
         working-directory: frontend
@@ -47,6 +47,6 @@ jobs:
 
       # -------- SonarCloud Scan --------
       - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@v6
+        uses: SonarSource/sonarcloud-github-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
