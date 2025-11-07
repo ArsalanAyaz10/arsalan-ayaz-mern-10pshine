@@ -80,7 +80,7 @@ const Signup = () => {
             Create an Account
           </h2>
           <p className="text-center text-gray-500 mb-6">
-            Join NotesPro and start managing your notes efficiently.
+            Join NotesKro and start managing your notes efficiently.
           </p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">

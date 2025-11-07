@@ -1,3 +1,4 @@
+import { input } from "framer-motion/client";
 import React from "react";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}

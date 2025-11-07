@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import noteRoutes from "./routes/noteRoutes.js";
+import profileRoutes from "./routes/profileRoutes.js";
 import errorHandler from "./middleware/errorHandler.js";
 
 dotenv.config()
@@ -22,7 +23,7 @@ connectDB();
 
 app.use("/api/auth", authRoutes);
 app.use("/api/notes", noteRoutes);
-
+app.use("/api/user", profileRoutes);
 
 app.get("/", (req, res) => {
   res.send("API is running...");
