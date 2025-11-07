@@ -21,15 +21,23 @@ jobs:
         with:
           node-version: 18
 
-      # -------- Install & Test Backend --------
+      # -------- Install & Test Backend (Injecting Secrets) --------
       - name: Install Backend Dependencies
         working-directory: backend
         run: npm install
 
       - name: Run Backend Tests with Coverage
         working-directory: backend
+        # Inject the fallback secrets to ensure token signing/verification succeeds
         run: npm test
-
+        env:
+          # Used for Access Token signing/verification
+          JWT_ACCESS_SECRET: 'test-secret' 
+          # Used for Refresh Token signing/verification
+          JWT_REFRESH_SECRET: 'test-refresh' 
+          # You MUST also include any other required secrets (like MongoDB URI)
+          MONGODB_URI: ${{ secrets.MONGODB_URI_TEST }}
+          
       # -------- Install & Test Frontend --------
       - name: Install Frontend Dependencies
         working-directory: frontend
