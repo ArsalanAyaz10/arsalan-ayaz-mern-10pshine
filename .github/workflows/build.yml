@@ -1,19 +1,52 @@
-name: Build
+name: SonarCloud Scan
+
 on:
   push:
-    branches:
-      - develop
+    # Only run the full scan on pushes to the develop branch (to set the baseline)
+    branches: [develop]
   pull_request:
+    # Run tests and a quick scan on PRs (to check new code quality)
     types: [opened, synchronize, reopened]
+
 jobs:
-  sonarqube:
-    name: SonarQube
+  sonarcloud:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - name: SonarQube Scan
+          # Required for SonarCloud to analyze the history needed for PR analysis
+          fetch-depth: 0
+
+      - name: Setup Node.js (Version 18)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      # -------- Install Dependencies (Backend & Frontend) --------
+      - name: Install Backend Dependencies
+        working-directory: backend
+        run: npm install
+
+      - name: Install Frontend Dependencies
+        working-directory: frontend
+        run: npm install
+
+      # -------- Run Tests and Generate Coverage (CRITICAL) --------
+      - name: Run Backend Tests with Coverage
+        working-directory: backend
+        run: npm test
+        env:
+          JWT_ACCESS_SECRET: 'test-secret' 
+          MONGODB_URI: ${{ secrets.MONGODB_URI_TEST }} 
+
+      - name: Run Frontend Tests with Coverage
+        working-directory: frontend
+        run: npm test -- --coverage
+
+      # -------- SonarCloud Scan --------
+      - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
