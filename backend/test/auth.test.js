@@ -6,7 +6,7 @@ import app from "../app.js";
 import User from "../models/UserModel.js";
 import * as emailService from "../utils/mailer.js"; // <-- mock this
 import "./setup.js";
-z
+
 const request = supertest(app);
 
 describe("Auth API", function () {
